@@ -21,10 +21,26 @@ if uploaded_file is not None:
 
     if response.status_code == 200:
         result_json = response.json()
-        st.json(result_json)
-        # Visualize bounding boxes on the image
-        for detection in result_json['predictions']:
-            label = detection['label']
-            confidence = detection['confidence']
-            box = detection['box']
-            st.image(image.crop(box), caption=f'{label} ({confidence:.2f})', use_column_width=True)
+        
+        # Convert JSON string to Python object
+        detections = result_json['detections']
+        
+        #Visualize image from the filename in result_json
+        outputFilename = result_json['filename']
+        outputFilename = '../backend/'+outputFilename
+        outputImage = Image.open(outputFilename)
+        st.image(outputImage, caption='Processed Image', use_column_width=True)
+        
+    
+        # # Visualize bounding boxes on the image
+        # for detection in detections:
+        #     print(detection)
+        #     label = detection['name']
+        #     confidence = detection['confidence']
+            
+        #     #extract box from x1,y1,x2,y2
+        #     box = detection['box']
+        #     box = (box['x1'], box['y1'], box['x2'], box['y2'])
+            
+        #     st.image(image.crop(box), caption=f'{label} ({confidence:.2f})', use_column_width=True)
+            
