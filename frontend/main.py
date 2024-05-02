@@ -4,6 +4,7 @@ import streamlit as st
 import requests
 from PIL import Image
 from io import BytesIO
+import ujson
 
 # Frontend (Streamlit) part
 st.title('YOLOv8 Object Detection')
@@ -12,8 +13,13 @@ st.title('YOLOv8 Object Detection')
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image', use_column_width=True)
+    # Split the layout into two columns
+    col1, col2 = st.columns(2)
+
+    # Display the uploaded image in the first column
+    with col1:
+        image = Image.open(uploaded_file)
+        st.image(image, caption='Uploaded Image', use_column_width=True)
 
     # Send image to FastAPI
     files = {'file': uploaded_file.getvalue()}
@@ -23,24 +29,34 @@ if uploaded_file is not None:
         result_json = response.json()
         
         # Convert JSON string to Python object
-        detections = result_json['detections']
+        detections = result_json['poses']
         
-        #Visualize image from the filename in result_json
-        outputFilename = result_json['filename']
-        outputFilename = '../backend/'+outputFilename
+        # Visualize image from the filename in result_json
+        outputFilename = result_json['poseFilename']
+        outputFilename = '../backend/' + outputFilename
         outputImage = Image.open(outputFilename)
-        st.image(outputImage, caption='Processed Image', use_column_width=True)
-        
-    
-        # # Visualize bounding boxes on the image
-        # for detection in detections:
-        #     print(detection)
-        #     label = detection['name']
-        #     confidence = detection['confidence']
-            
-        #     #extract box from x1,y1,x2,y2
-        #     box = detection['box']
-        #     box = (box['x1'], box['y1'], box['x2'], box['y2'])
-            
-        #     st.image(image.crop(box), caption=f'{label} ({confidence:.2f})', use_column_width=True)
-            
+
+        # Display the processed image in the second column
+        with col2:
+            st.image(outputImage, caption='Processed Image', use_column_width=True)
+            # Button to download JSON text
+            json_text = ujson.dumps(result_json, indent=4)
+            st.download_button(
+                label="Download JSON",
+                data=json_text,
+                file_name="result.json",
+                mime="text/plain"
+            )
+            #Button to download image result 
+            output_image_data = BytesIO()
+            outputImage.save(output_image_data, format='JPEG')
+            output_image_data.seek(0)
+
+            # Button to download image result 
+            st.download_button(
+                label="Download Image",
+                data=output_image_data,
+                file_name="result.jpg",
+                mime="image/jpeg"
+            )
+     
