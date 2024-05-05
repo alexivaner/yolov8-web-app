@@ -51,23 +51,14 @@ async def process_upload_file(file: UploadFile = File(...)):
         filename = file.filename
 
         if file.content_type.startswith("image"):
-            target = Image.open(io.BytesIO(contents))
+            image = Image.open(io.BytesIO(contents))
             #get image filename
             pose_result_filename = 'tmp/{}_pose_result.jpg'.format(filename)
             pose_json_filename = 'tmp/{}_pose_result.json'.format(filename)
-
-        elif file.content_type.startswith("video"):
-            # Save the uploaded video file to a temporary location
-            target = f'tmp/{filename}'
-            with open(target, 'wb') as video_file:
-                video_file.write(contents)
-            pose_result_filename = 'tmp/{}_pose_result.mp4'.format(filename)
-            pose_json_filename = 'tmp/{}_pose_result.json'.format(filename)     
-        else:
-            raise HTTPException(status_code=400, detail="Invalid file type")       
- 
+            
+        
         # Process the uploaded image using YOLO
-        poses = modelPose(target)  # Assuming YOLO model can directly process PIL images
+        poses = modelPose(image)  # Assuming YOLO model can directly process PIL images
         for pose in poses:
             pose.save(filename=pose_result_filename)  # save to disk
             poseJson = pose.tojson()            
