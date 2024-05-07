@@ -44,9 +44,12 @@ if uploaded_file is not None:
             with col2:
                 st.image(outputImage, caption='Processed Image', use_column_width=True)
 
+                # Display download buttons side by side
+                download_col1, download_col2 = st.columns(2)
+
                 # Download JSON button
                 json_text = ujson.dumps(result_json, indent=4)
-                st.download_button(
+                download_col1.download_button(
                     label="Download JSON",
                     data=json_text,
                     file_name="result.json",
@@ -59,7 +62,7 @@ if uploaded_file is not None:
                 outputImage.save(output_image_data, format='JPEG')
                 output_image_data.seek(0)
 
-                st.download_button(
+                download_col2.download_button(
                     label="Download Image",
                     data=output_image_data,
                     file_name="result.jpg",
