@@ -4,6 +4,9 @@ This is a web application for object detection using YOLOv8. The application con
 
 ## Features
 
+<!-- append screenshot -->
+![image](screenshot/screenshot.png)
+
 - Real-time object detection using YOLOv8.
 - User-friendly interface for uploading images and viewing detection results.
 - Automatic reloading of backend server upon code changes.
